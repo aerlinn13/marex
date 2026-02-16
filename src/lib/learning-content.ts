@@ -681,4 +681,205 @@ export const LEARNING_CONTENT: Record<string, LearningArticle> = {
     realWorldExample:
       "A trader buys EUR/USD 5M at 1.0800, then sells EUR/USD 8M at 1.0830. Net position: Short EUR 3M at an effective entry around 1.0830. If EUR/USD drops to 1.0800, the unrealized PnL is +(1.0830 − 1.0800) × 3M = +$9,000.",
   },
+
+  "keyboard-shortcuts": {
+    title: "Keyboard Shortcuts in Trading Terminals",
+    category: "Infrastructure",
+    summary:
+      "Keyboard shortcuts enable traders to execute critical actions in milliseconds — far faster than mouse navigation — which can mean the difference between catching and missing a price.",
+    content: [
+      "Professional trading terminals are designed for speed. Every action that can be bound to a keystroke saves time: setting direction (B for Buy, S for Sell), submitting orders (Ctrl+Enter), and emergency actions (Ctrl+Shift+X for OFF ALL) are all standard shortcuts.",
+      "Shortcuts are typically disabled when the cursor is in a text input field to prevent accidental triggering. This is why pressing 'B' in a notes field types the letter, but pressing 'B' elsewhere sets the direction to Buy.",
+      "Experienced FX traders rarely touch the mouse during active trading. The workflow is almost entirely keyboard-driven: select pair with a hotkey, set direction, type amount, adjust price, and submit — all without lifting hands from the keyboard.",
+    ],
+    keyTerms: [
+      { term: "Hotkey", definition: "A keyboard shortcut that triggers a specific action in the terminal" },
+      { term: "Modifier Key", definition: "Ctrl, Shift, or Alt — combined with other keys to create compound shortcuts" },
+      { term: "Focus Context", definition: "Whether shortcuts are active depends on which UI element has focus" },
+    ],
+    realWorldExample:
+      "A scalper sees EUR/USD spike on a news headline. They press B (Buy), type the amount, press Ctrl+Enter to submit — total time under 2 seconds. A mouse-driven workflow would take 5–10 seconds, by which time the price may have moved 10+ pips.",
+  },
+
+  "trade-confirmation": {
+    title: "Pre-Trade Confirmation & Compliance",
+    category: "Risk",
+    summary:
+      "The trade confirmation dialog acts as a final checkpoint before order submission — displaying key details and flagging potential issues like large notionals or distant prices.",
+    content: [
+      "Pre-trade confirmation is a risk management requirement in institutional FX. Before an order is sent to market, the trader sees a summary of all parameters: direction, pair, type, amount, price, and time-in-force. This 'are you sure?' step prevents costly errors.",
+      "The dialog highlights warnings when order parameters are unusual: large notional amounts (exceeding desk thresholds), prices far from the current market (which might indicate a fat-finger error), or other risk flags defined by the firm's compliance rules.",
+      "Regulatory frameworks like MiFID II require firms to implement pre-trade controls. These include price collars (rejecting orders too far from market), size limits, and mandatory confirmation for orders above certain thresholds. The confirmation dialog is the trader-facing part of this control framework.",
+    ],
+    keyTerms: [
+      { term: "Pre-Trade Check", definition: "Automated validation of order parameters before submission to market" },
+      { term: "Fat-Finger Error", definition: "An accidental order with incorrect parameters — usually wrong price or amount" },
+      { term: "Price Collar", definition: "A maximum allowed deviation from the current market price for new orders" },
+      { term: "Notional Threshold", definition: "A size limit above which additional confirmation or approval is required" },
+    ],
+    realWorldExample:
+      "A trader accidentally types 100M instead of 10M for a EUR/USD order. The confirmation dialog flags: 'Large notional: 100M exceeds 5M threshold'. The trader catches the error and corrects it before the order reaches the market.",
+  },
+
+  "sma-indicator": {
+    title: "Simple Moving Average (SMA)",
+    category: "Technical Analysis",
+    summary:
+      "The SMA calculates the arithmetic mean of closing prices over a set period — smoothing price data to reveal the underlying trend direction.",
+    content: [
+      "A Simple Moving Average (SMA) is calculated by adding the closing prices for the last N periods and dividing by N. For example, a 20-period SMA on a 1H chart averages the last 20 hourly closing prices. Each new candle drops the oldest price and adds the newest.",
+      "The SMA is a lagging indicator — it follows price rather than predicting it. When the price is above the SMA, the trend is generally considered bullish; when below, bearish. Crossovers between price and SMA, or between two SMAs of different periods, are common trading signals.",
+      "Common SMA periods in FX: 20 (short-term trend), 50 (medium-term), 100 and 200 (long-term). The 200-day SMA is particularly significant — institutional traders and algorithms often use it as a key support/resistance level.",
+    ],
+    keyTerms: [
+      { term: "SMA", definition: "Simple Moving Average — the arithmetic mean of closing prices over N periods" },
+      { term: "Lagging Indicator", definition: "A technical indicator that follows price action rather than predicting it" },
+      { term: "Golden Cross", definition: "When a shorter-period SMA crosses above a longer-period SMA — a bullish signal" },
+      { term: "Death Cross", definition: "When a shorter-period SMA crosses below a longer-period SMA — a bearish signal" },
+    ],
+    realWorldExample:
+      "EUR/USD has been trading below its 200-day SMA at 1.0900 for weeks. When price finally breaks above 1.0900 with strong volume, algorithmic systems and trend-followers pile into long positions, creating a self-reinforcing rally.",
+  },
+
+  "ema-indicator": {
+    title: "Exponential Moving Average (EMA)",
+    category: "Technical Analysis",
+    summary:
+      "The EMA gives more weight to recent prices, making it more responsive to new information than the SMA — preferred by traders who need faster signals.",
+    content: [
+      "The Exponential Moving Average (EMA) applies a weighting multiplier that gives greater importance to recent prices. The formula is: EMA = (Close − Previous EMA) × multiplier + Previous EMA, where the multiplier = 2 / (N + 1). This makes the EMA react faster to price changes than the SMA.",
+      "Because the EMA responds more quickly to recent price action, it generates trading signals earlier than the SMA. However, this sensitivity is a double-edged sword: faster signals also mean more false signals, especially in choppy, range-bound markets.",
+      "In FX, short-period EMAs (8, 10, 13) are popular with day traders and scalpers. The EMA is also a component of other indicators — for example, the MACD (Moving Average Convergence Divergence) is based on the difference between a 12-period and 26-period EMA.",
+    ],
+    keyTerms: [
+      { term: "EMA", definition: "Exponential Moving Average — a weighted average that emphasises recent prices" },
+      { term: "Weighting Multiplier", definition: "The factor that determines how much weight recent prices receive (2 / (N+1))" },
+      { term: "Responsiveness", definition: "How quickly an indicator reacts to new price data" },
+      { term: "MACD", definition: "Moving Average Convergence Divergence — a trend indicator derived from two EMAs" },
+    ],
+    realWorldExample:
+      "A day trader uses a 10-period EMA on the 5-minute chart. EUR/USD dips to the EMA at 1.0830 and bounces — the trader buys, using the EMA as dynamic support. The SMA would have been at 1.0825, missing the actual bounce point.",
+  },
+
+  "bollinger-bands": {
+    title: "Bollinger Bands",
+    category: "Technical Analysis",
+    summary:
+      "Bollinger Bands wrap a moving average with volatility-based envelopes — expanding in volatile markets and contracting in quiet ones — to identify overbought/oversold conditions.",
+    content: [
+      "Bollinger Bands consist of three lines: a middle band (typically a 20-period SMA), an upper band (SMA + 2 standard deviations), and a lower band (SMA − 2 standard deviations). The bands dynamically adjust to market volatility — wider in volatile conditions, narrower when the market is calm.",
+      "Statistically, approximately 95% of price action falls within the 2-standard-deviation bands. When price touches or exceeds the upper band, the market may be overbought; when it touches the lower band, oversold. However, in strong trends, prices can 'walk the band' for extended periods.",
+      "The 'Bollinger Squeeze' is a powerful signal: when the bands contract to their narrowest width, it indicates low volatility — which often precedes a sharp breakout. Traders watch for squeezes and position for the subsequent expansion in volatility.",
+    ],
+    keyTerms: [
+      { term: "Bollinger Bands", definition: "Volatility bands placed above and below a moving average at ±2 standard deviations" },
+      { term: "Standard Deviation", definition: "A statistical measure of price dispersion — higher values indicate greater volatility" },
+      { term: "Bollinger Squeeze", definition: "When the bands contract tightly, signalling low volatility and a potential impending breakout" },
+      { term: "Walking the Band", definition: "When price stays near the upper or lower band during a strong trend" },
+    ],
+    realWorldExample:
+      "GBP/USD Bollinger Bands narrow to their tightest in 3 months — a classic squeeze. The trader sets buy and sell stop orders just outside the bands. When the Bank of England surprises with a rate hike, price breaks above the upper band and the buy stop triggers, catching the breakout.",
+  },
+
+  "risk-dashboard": {
+    title: "Risk Dashboard & Exposure Management",
+    category: "Risk",
+    summary:
+      "The risk dashboard provides a consolidated view of all risk metrics — net currency exposure, margin utilisation, position limits, and top risk items — enabling real-time risk monitoring.",
+    content: [
+      "The risk dashboard aggregates multiple risk dimensions into a single view. Net currency exposure shows directional risk per currency; margin utilisation shows how much of the firm's collateral is committed; and position limit bars show utilisation against pre-set maximums per pair.",
+      "Top risk items are algorithmically identified: concentrated exposure in a single currency, high margin utilisation (above 80%), pairs approaching position limits, and correlation risk (e.g. being long both EUR/USD and GBP/USD, which are highly correlated). These are ranked by severity.",
+      "In institutional FX, risk dashboards are monitored not just by traders but by independent risk managers who can override trading activity. If margin utilisation exceeds a threshold, the risk manager can suspend new order placement until exposure is reduced.",
+    ],
+    keyTerms: [
+      { term: "Net Exposure", definition: "The total directional risk per currency after netting long and short positions" },
+      { term: "Margin Utilisation", definition: "The percentage of available collateral currently committed to support open positions" },
+      { term: "Position Limit", definition: "The maximum allowed exposure per currency pair, set by risk management" },
+      { term: "Correlation Risk", definition: "The risk that multiple positions move against you simultaneously because the underlyings are correlated" },
+    ],
+    realWorldExample:
+      "A risk manager sees the dashboard showing EUR exposure at 90% of limit and margin at 78%. They alert the desk: no new EUR positions until exposure drops below 75%. A trader closes EUR/CHF 5M to bring exposure back within limits.",
+  },
+
+  "audio-alerts": {
+    title: "Audio Alerts in Trading Systems",
+    category: "Infrastructure",
+    summary:
+      "Audio alerts notify traders of critical events — order fills, risk breaches, and price triggers — without requiring visual attention on the screen.",
+    content: [
+      "Trading floors are multi-screen environments where traders cannot watch every element simultaneously. Audio alerts provide an additional notification channel: distinct sounds for order fills, risk warnings, connection issues, and price alerts ensure critical events are not missed.",
+      "Common audio events in FX terminals: order filled (a confirmation chime), risk limit breach (an urgent warning tone), connection lost (a distinct alert), and price level reached (a notification sound). Each sound is designed to be distinguishable even in a noisy trading floor environment.",
+      "The ability to mute audio is essential — during calls, meetings, or when alerts become overwhelming in extremely active markets. Professional systems allow per-category muting (e.g. silence fill alerts but keep risk warnings) for fine-grained control.",
+    ],
+    keyTerms: [
+      { term: "Audio Alert", definition: "An audible notification triggered by a specific trading or system event" },
+      { term: "Fill Alert", definition: "A sound that plays when a resting order has been executed" },
+      { term: "Risk Alert Sound", definition: "A distinctive warning tone when risk limits are approached or breached" },
+      { term: "Alert Fatigue", definition: "When excessive alerts cause traders to ignore or dismiss important notifications" },
+    ],
+    realWorldExample:
+      "A trader has a buy limit resting in USD/JPY while focused on a EUR/USD chart. The fill chime sounds — the USD/JPY order has executed. Without the audio alert, they might not notice for minutes, during which time they could miss an opportunity to set a stop-loss.",
+  },
+
+  "pnl-summary": {
+    title: "P&L Tracking & Equity Curve",
+    category: "Position Management",
+    summary:
+      "The P&L summary aggregates realized and unrealized profit/loss across all positions, with an equity curve showing how portfolio value has evolved over time.",
+    content: [
+      "P&L (Profit and Loss) tracking is the fundamental measure of trading performance. Total P&L combines unrealized P&L (from open positions, fluctuating with market prices) and realized P&L (locked in from closed trades). The breakdown by pair shows which instruments are contributing to or detracting from performance.",
+      "The equity curve plots total portfolio value over time — the most important chart for evaluating a trader's performance. A steadily rising curve indicates consistent profitability; sharp drawdowns indicate periods of loss. Risk managers monitor the equity curve for maximum drawdown (the largest peak-to-trough decline).",
+      "P&L attribution by currency pair helps traders identify their strengths and weaknesses. If a trader consistently profits in EUR/USD but loses in GBP/JPY, it suggests they should concentrate on EUR/USD and reduce GBP/JPY activity — or investigate why their edge doesn't transfer.",
+    ],
+    keyTerms: [
+      { term: "Equity Curve", definition: "A time-series chart of total portfolio value, showing cumulative P&L over time" },
+      { term: "Drawdown", definition: "The peak-to-trough decline in portfolio value — a key measure of risk" },
+      { term: "P&L Attribution", definition: "Breaking down total P&L by instrument, strategy, or time period to identify performance drivers" },
+      { term: "Sharpe Ratio", definition: "Risk-adjusted return: the average return divided by the standard deviation of returns" },
+    ],
+    realWorldExample:
+      "A desk head reviews the weekly P&L summary: +$120K total, with EUR/USD contributing +$200K and GBP/USD losing −$80K. The equity curve shows a smooth upward trajectory with a 2% maximum drawdown — indicating disciplined risk management.",
+  },
+
+  "algo-orders": {
+    title: "Algorithmic Order Types (TWAP/VWAP)",
+    category: "Execution",
+    summary:
+      "TWAP and VWAP algorithms split large orders into smaller slices executed over time, minimising market impact and achieving benchmark execution prices.",
+    content: [
+      "TWAP (Time-Weighted Average Price) divides an order into equal-sized slices and executes them at regular intervals over a specified duration. For example, selling EUR 50M over 30 minutes with 10 slices means executing EUR 5M every 3 minutes. The goal is to match the time-weighted average price of the execution period.",
+      "VWAP (Volume-Weighted Average Price) executes proportionally to market volume rather than time. It targets the volume-weighted average price as its benchmark. Participation rate (e.g. 25%) determines what fraction of market volume the algorithm consumes. VWAP reduces market impact by trading more when liquidity is abundant.",
+      "These algorithms are essential for institutional FX. A trader selling USD 500M in a single clip would move the market several pips against themselves. By using TWAP or VWAP, the impact is distributed across time and liquidity, achieving a better average price.",
+    ],
+    keyTerms: [
+      { term: "TWAP", definition: "Time-Weighted Average Price — executes equal slices at regular time intervals" },
+      { term: "VWAP", definition: "Volume-Weighted Average Price — executes proportionally to market volume" },
+      { term: "Market Impact", definition: "The adverse price movement caused by executing a large order" },
+      { term: "Participation Rate", definition: "The fraction of market volume that the VWAP algorithm targets (e.g. 25%)" },
+      { term: "Slicing", definition: "Breaking a large order into smaller child orders for gradual execution" },
+    ],
+    realWorldExample:
+      "A sovereign wealth fund needs to sell USD 200M against JPY. A single market order would move the rate 5+ pips. Instead, they use a VWAP algorithm with 20% participation over 2 hours. The algorithm monitors real-time volume and adjusts slice sizes, achieving a fill within 0.5 pips of VWAP — saving approximately $100K versus a single block trade.",
+  },
+
+  "fix-protocol": {
+    title: "FIX Protocol Messages",
+    category: "Infrastructure",
+    summary:
+      "FIX (Financial Information eXchange) is the standard messaging protocol for electronic trading — every order, execution, and status update flows as a structured FIX message.",
+    content: [
+      "The FIX protocol is the universal language of electronic trading, used by virtually every financial institution, broker, and exchange worldwide. Each FIX message is a sequence of tag=value pairs separated by delimiters. Key tags include: 35 (MsgType), 11 (ClOrdID), 55 (Symbol), 54 (Side), 38 (OrderQty), 44 (Price), and 39 (OrdStatus).",
+      "Message types map to the order lifecycle: New Order Single (D) for placing orders, Execution Report (8) for fills and status updates, Order Cancel Request (F) for cancellations, and Order Cancel/Replace Request (G) for amendments. Each message type has required and optional fields defined by the FIX specification.",
+      "Understanding FIX messages is essential for diagnosing trading issues. When an order is rejected, the FIX Execution Report contains the reject reason (tag 103). When a fill price seems wrong, inspecting the raw FIX message shows exactly what the counterparty reported. Support teams and developers regularly parse FIX logs for troubleshooting.",
+    ],
+    keyTerms: [
+      { term: "FIX Protocol", definition: "Financial Information eXchange — the standard electronic trading message protocol (current version: FIX 4.4/5.0)" },
+      { term: "Tag", definition: "A numeric field identifier in a FIX message (e.g. tag 35 = MsgType)" },
+      { term: "MsgType (35)", definition: "The message type identifier: D=New Order, 8=Execution Report, F=Cancel Request" },
+      { term: "Execution Report (8)", definition: "The primary FIX message for order status updates, fills, and rejections" },
+      { term: "ClOrdID (11)", definition: "Client Order ID — the unique identifier assigned by the order originator" },
+    ],
+    realWorldExample:
+      "A trader's limit order is unexpectedly rejected. The support desk pulls the FIX log and finds the Execution Report: 35=8|39=8|103=99|58=Insufficient credit. The reject reason (tag 103=99, tag 58 text) reveals the counterparty's credit check failed — the trader needs to contact their credit team.",
+  },
 };

@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState, type MutableRefObject } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { orderFormSchema, type OrderFormSchema } from "@/lib/validators";
@@ -19,16 +20,25 @@ import {
 } from "@/components/ui/select";
 import { PriceDisplay } from "../shared/price-display";
 import { PanelHeader } from "../shared/panel-header";
+import { TradeConfirmationDialog } from "./trade-confirmation-dialog";
 import { getCurrencyPairSymbols } from "@/lib/currency-pairs";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import type { OrderType, OrderTimeInForce } from "@/types";
 
-export function OrderEntryForm() {
+interface OrderEntryFormProps {
+  imperativeRef?: MutableRefObject<{ setDirection: (d: "Buy" | "Sell") => void; submit: () => void } | null>;
+  cancelAllRef?: MutableRefObject<(() => void) | null>;
+}
+
+export function OrderEntryForm({ imperativeRef, cancelAllRef }: OrderEntryFormProps) {
   const { selectedPair } = useTerminalState();
-  const { placeOrder } = useOrders();
+  const { placeOrder, cancelAllOrders } = useOrders();
   const { ratesMap } = useFxRates("All");
   const { toast } = useToast();
   const rate = ratesMap.get(selectedPair);
+  const formRef = useRef<HTMLFormElement>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [pendingData, setPendingData] = useState<OrderFormSchema | null>(null);
 
   const {
     register,
@@ -36,6 +46,8 @@ export function OrderEntryForm() {
     setValue,
     watch,
     reset,
+    trigger,
+    getValues,
     formState: { errors },
   } = useForm<OrderFormSchema>({
     resolver: zodResolver(orderFormSchema),
@@ -53,6 +65,31 @@ export function OrderEntryForm() {
 
   const watchedPrice = watch("price");
   const watchedType = watch("type");
+  const watchedDirection = watch("direction");
+
+  // Expose imperative methods for keyboard shortcuts
+  useEffect(() => {
+    if (imperativeRef) {
+      imperativeRef.current = {
+        setDirection: (d: "Buy" | "Sell") => {
+          setValue("direction", d);
+          // Focus the amount input
+          const amountInput = document.getElementById("order-amount");
+          amountInput?.focus();
+        },
+        submit: () => {
+          formRef.current?.requestSubmit();
+        },
+      };
+    }
+    if (cancelAllRef) {
+      cancelAllRef.current = cancelAllOrders;
+    }
+    return () => {
+      if (imperativeRef) imperativeRef.current = null;
+      if (cancelAllRef) cancelAllRef.current = null;
+    };
+  }, [imperativeRef, cancelAllRef, setValue, cancelAllOrders]);
 
   function adjustPrice(delta: number) {
     const isJpy = selectedPair.includes("JPY");
@@ -61,15 +98,22 @@ export function OrderEntryForm() {
   }
 
   function onSubmit(data: OrderFormSchema) {
+    // Show confirmation dialog instead of placing immediately
+    setPendingData(data);
+    setConfirmOpen(true);
+  }
+
+  function handleConfirm() {
+    if (!pendingData) return;
     const order = placeOrder({
-      pair: data.pair,
-      direction: data.direction,
-      type: data.type as OrderType,
-      amount: data.amount,
-      currency: data.currency,
-      price: data.price,
-      tif: data.tif as OrderTimeInForce,
-      notes: data.notes,
+      pair: pendingData.pair,
+      direction: pendingData.direction,
+      type: pendingData.type as OrderType,
+      amount: pendingData.amount,
+      currency: pendingData.currency,
+      price: pendingData.price,
+      tif: pendingData.tif as OrderTimeInForce,
+      notes: pendingData.notes,
     });
 
     toast({
@@ -88,6 +132,14 @@ export function OrderEntryForm() {
       tif: "GTC",
       notes: "",
     });
+
+    setConfirmOpen(false);
+    setPendingData(null);
+  }
+
+  function handleCancelConfirm() {
+    setConfirmOpen(false);
+    setPendingData(null);
   }
 
   const pairs = getCurrencyPairSymbols();
@@ -95,23 +147,72 @@ export function OrderEntryForm() {
   return (
     <div className="flex flex-col">
       <PanelHeader title="Order Entry" />
-      <form data-learn="order-entry" onSubmit={handleSubmit(onSubmit)} className="space-y-3 p-3" noValidate>
+      <form ref={formRef} data-learn="order-entry" onSubmit={handleSubmit(onSubmit)} className="space-y-3 p-3" noValidate>
+        {/* Direction toggle */}
+        <div className="flex space-x-1">
+          {(["Buy", "Sell"] as const).map((d) => (
+            <Button
+              key={d}
+              type="button"
+              variant={watchedDirection === d ? (d === "Buy" ? "default" : "destructive") : "terminalGhost"}
+              size="xs"
+              className="flex-1"
+              onClick={() => setValue("direction", d)}
+            >
+              {d}
+            </Button>
+          ))}
+        </div>
+
         {/* Type toggle */}
         <div className="flex space-x-1">
-          {(["LIMIT", "STOP"] as const).map((t) => (
+          {(["LIMIT", "STOP", "TWAP", "VWAP"] as const).map((t) => (
             <Button
               key={t}
               type="button"
               variant={watchedType === t ? "secondary" : "terminalGhost"}
               size="xs"
               className="flex-1"
-              data-learn={t === "LIMIT" ? "limit-order" : "stop-order"}
+              data-learn={t === "LIMIT" ? "limit-order" : t === "STOP" ? "stop-order" : undefined}
               onClick={() => setValue("type", t)}
             >
               {t}
             </Button>
           ))}
         </div>
+
+        {/* Algo parameters (for TWAP/VWAP) */}
+        {(watchedType === "TWAP" || watchedType === "VWAP") && (
+          <div data-learn="algo-orders" className="rounded border border-marex-border-subtle bg-marex-bg-elevated p-2 space-y-2">
+            <div className="flex items-center space-x-1">
+              <span className="inline-flex items-center rounded bg-marex-accent-purple/20 px-1.5 py-0.5 text-[10px] font-semibold text-marex-accent-purple">
+                {watchedType}
+              </span>
+              <span className="text-[10px] text-muted-foreground">Algorithmic Execution</span>
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <div className="space-y-0.5">
+                <Label className="text-[10px] text-muted-foreground">Slices</Label>
+                <Input type="number" defaultValue={10} className="h-6 text-xs font-mono" readOnly />
+              </div>
+              <div className="space-y-0.5">
+                <Label className="text-[10px] text-muted-foreground">Duration</Label>
+                <Input type="text" defaultValue="30m" className="h-6 text-xs font-mono" readOnly />
+              </div>
+              {watchedType === "VWAP" && (
+                <div className="col-span-2 space-y-0.5">
+                  <Label className="text-[10px] text-muted-foreground">Participation Rate</Label>
+                  <Input type="text" defaultValue="25%" className="h-6 text-xs font-mono" readOnly />
+                </div>
+              )}
+            </div>
+            <p className="text-[10px] text-muted-foreground italic">
+              {watchedType === "TWAP"
+                ? "Splits order into equal time-weighted slices over duration."
+                : "Executes proportionally to volume, targeting VWAP benchmark."}
+            </p>
+          </div>
+        )}
 
         {/* Live prices */}
         {rate && (
@@ -223,6 +324,14 @@ export function OrderEntryForm() {
           PLACE ORDER
         </Button>
       </form>
+
+      <TradeConfirmationDialog
+        open={confirmOpen}
+        onConfirm={handleConfirm}
+        onCancel={handleCancelConfirm}
+        data={pendingData}
+        rate={rate}
+      />
     </div>
   );
 }

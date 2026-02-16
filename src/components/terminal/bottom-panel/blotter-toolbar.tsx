@@ -21,6 +21,7 @@ export function BlotterToolbar({ searchValue, onSearchChange }: BlotterToolbarPr
             onChange={(e) => onSearchChange(e.target.value)}
             className="h-6 w-40 pl-7 text-xs"
             aria-label="Filter blotter"
+            data-blotter-search
           />
         </div>
       </div>

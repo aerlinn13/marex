@@ -4,24 +4,44 @@ import { cn } from "@/lib/utils";
 
 interface ConnectionStatusProps {
   connected: boolean;
+  latency?: number;
+  reconnecting?: boolean;
+  reconnectAttempt?: number;
 }
 
-export function ConnectionStatus({ connected }: ConnectionStatusProps) {
+export function ConnectionStatus({ connected, latency, reconnecting, reconnectAttempt }: ConnectionStatusProps) {
+  const label = reconnecting
+    ? `Reconnecting (attempt ${reconnectAttempt})...`
+    : connected
+    ? `Live${latency ? ` ${latency}ms` : ""}`
+    : "Disconnected";
+
   return (
     <div
       className="flex items-center space-x-2"
       role="status"
       aria-live="polite"
-      aria-label={connected ? "Connected to live feed" : "Disconnected from live feed"}
+      aria-label={label}
     >
       <div
         className={cn(
           "h-2 w-2 rounded-full",
-          connected ? "bg-green-500 animate-pulse" : "bg-red-500"
+          reconnecting
+            ? "bg-yellow-500 animate-pulse"
+            : connected
+            ? "bg-green-500 animate-pulse"
+            : "bg-red-500"
         )}
       />
-      <span className="text-xs text-muted-foreground">
-        {connected ? "Live" : "Disconnected"}
+      <span className={cn(
+        "text-xs font-mono",
+        reconnecting
+          ? "text-yellow-400"
+          : connected
+          ? "text-muted-foreground"
+          : "text-red-400"
+      )}>
+        {label}
       </span>
     </div>
   );

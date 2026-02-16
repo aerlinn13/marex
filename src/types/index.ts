@@ -77,7 +77,7 @@ export interface WebSocketMessage {
 }
 
 // Terminal types
-export type OrderType = "LIMIT" | "STOP";
+export type OrderType = "LIMIT" | "STOP" | "TWAP" | "VWAP";
 export type OrderTimeInForce = "GTC" | "IOC" | "FOK" | "GTD" | "DAY";
 export type OrderStatus = "Working" | "Filled" | "PartiallyFilled" | "Cancelled" | "Suspended" | "Rejected";
 export type FillStatus = "Full" | "Partial" | "None";

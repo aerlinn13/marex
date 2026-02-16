@@ -6,7 +6,7 @@ import { CURRENCY_PAIRS } from "@/lib/currency-pairs";
 import { FxRate, CurrencyPairCategory } from "@/types";
 
 export function useFxRates(category?: CurrencyPairCategory | "All") {
-  const { rates, connected, getHistory } = useMockWebSocket();
+  const { rates, connected, latency, reconnecting, reconnectAttempt, getHistory } = useMockWebSocket();
 
   const filteredRates = useMemo(() => {
     const filtered: FxRate[] = [];
@@ -18,5 +18,5 @@ export function useFxRates(category?: CurrencyPairCategory | "All") {
     return filtered;
   }, [rates, category]);
 
-  return { rates: filteredRates, ratesMap: rates, connected, getHistory };
+  return { rates: filteredRates, ratesMap: rates, connected, latency, reconnecting, reconnectAttempt, getHistory };
 }

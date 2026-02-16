@@ -5,9 +5,14 @@ import { useTerminalState } from "@/hooks/use-terminal-state";
 import { ConnectionStatus } from "@/components/shared/connection-status";
 import { useFxRates } from "@/hooks/use-fx-rates";
 import { Button } from "@/components/ui/button";
-import { Settings, Lock, Zap, LogOut, Wallet } from "lucide-react";
+import { Settings, Lock, Zap, LogOut, Wallet, Shield, Volume2, VolumeX, TrendingUp, FileCode } from "lucide-react";
 import { BalanceModal } from "@/components/terminal/balance-modal";
 import { AboutMeModal } from "@/components/terminal/about-me-modal";
+import { RiskDashboardModal } from "@/components/terminal/risk-dashboard-modal";
+import { PnlSummaryModal } from "@/components/terminal/pnl-summary-modal";
+import { FixMessageViewer } from "@/components/terminal/fix-message-viewer";
+import { usePositions } from "@/hooks/use-positions";
+import { usePnlTracker } from "@/hooks/use-pnl-tracker";
 
 function LiveClock() {
   const [time, setTime] = useState("");
@@ -38,9 +43,14 @@ function LiveClock() {
 export function TerminalHeader() {
   const [showBalances, setShowBalances] = useState(false);
   const [showAboutMe, setShowAboutMe] = useState(false);
-  const { screenLocked, setScreenLocked, volatileMarket, setVolatileMarket, provider } =
+  const [showRisk, setShowRisk] = useState(false);
+  const [showPnl, setShowPnl] = useState(false);
+  const [showFix, setShowFix] = useState(false);
+  const { screenLocked, setScreenLocked, volatileMarket, setVolatileMarket, provider, audioEnabled, setAudioEnabled } =
     useTerminalState();
-  const { connected } = useFxRates("All");
+  const { positions } = usePositions();
+  const pnl = usePnlTracker(positions);
+  const { connected, latency, reconnecting, reconnectAttempt } = useFxRates("All");
   const tradeDate = new Date().toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "short",
@@ -118,27 +128,64 @@ export function TerminalHeader() {
             <span>Volatile Market {volatileMarket ? "ON" : "OFF"}</span>
           </button>
 
+          <button
+            data-learn="audio-alerts"
+            className={`flex items-center space-x-1 rounded px-2 py-0.5 text-xs transition-colors ${
+              audioEnabled
+                ? "text-muted-foreground hover:text-foreground"
+                : "bg-marex-sell/20 text-marex-sell"
+            }`}
+            onClick={() => setAudioEnabled(!audioEnabled)}
+            title={audioEnabled ? "Mute audio alerts" : "Unmute audio alerts"}
+          >
+            {audioEnabled ? <Volume2 className="h-3 w-3" /> : <VolumeX className="h-3 w-3" />}
+            <span>{audioEnabled ? "Audio" : "Muted"}</span>
+          </button>
+
           <span className="rounded bg-marex-bg-elevated px-2 py-0.5 text-xs text-muted-foreground">
             Provider: <span className="font-medium text-foreground">{provider}</span>
           </span>
         </div>
 
         <div className="flex items-center space-x-2">
+          <button
+            data-learn="pnl-summary"
+            className="flex items-center space-x-1 rounded px-2 py-0.5 text-xs hover:bg-marex-bg-elevated transition-colors cursor-pointer"
+            onClick={() => setShowPnl(true)}
+            title="View P&L Summary"
+          >
+            <TrendingUp className="h-3 w-3" />
+            <span className="text-muted-foreground">P&L</span>
+            <span className={`font-mono font-semibold ${pnl.totalPnl >= 0 ? "text-marex-buy" : "text-marex-sell"}`}>
+              {pnl.totalPnl >= 0 ? "+" : ""}{Math.abs(pnl.totalPnl) >= 1_000_000 ? `${(pnl.totalPnl / 1_000_000).toFixed(2)}M` : Math.abs(pnl.totalPnl) >= 1_000 ? `${(pnl.totalPnl / 1_000).toFixed(1)}K` : pnl.totalPnl.toFixed(2)}
+            </span>
+          </button>
           <Button variant="offAll" size="xs" data-learn="off-all">
             OFF ALL ORG
+          </Button>
+          <Button variant="terminalGhost" size="xs" data-learn="fix-protocol" onClick={() => setShowFix(true)}>
+            <FileCode className="mr-1 h-3 w-3" />
+            FIX
+          </Button>
+          <Button variant="terminalGhost" size="xs" data-learn="risk-dashboard" onClick={() => setShowRisk(true)}>
+            <Shield className="mr-1 h-3 w-3" />
+            Risk
           </Button>
           <Button variant="terminalGhost" size="xs" data-learn="account-balances" onClick={() => setShowBalances(true)}>
             <Wallet className="mr-1 h-3 w-3" />
             View Balances
           </Button>
           <span data-learn="connection-status">
-            <ConnectionStatus connected={connected} />
+            <ConnectionStatus connected={connected} latency={latency} reconnecting={reconnecting} reconnectAttempt={reconnectAttempt} />
           </span>
         </div>
       </div>
 
       <BalanceModal open={showBalances} onClose={() => setShowBalances(false)} />
       <AboutMeModal open={showAboutMe} onClose={() => setShowAboutMe(false)} />
+      <RiskDashboardModal open={showRisk} onClose={() => setShowRisk(false)} />
+      <PnlSummaryModal open={showPnl} onClose={() => setShowPnl(false)} />
+      <FixMessageViewer open={showFix} onClose={() => setShowFix(false)} />
     </header>
   );
 }

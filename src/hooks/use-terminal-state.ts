@@ -13,6 +13,7 @@ interface TerminalState {
   volatileMarket: boolean;
   provider: string;
   learningMode: boolean;
+  audioEnabled: boolean;
   setSelectedPair: (pair: string) => void;
   setLeftTab: (tab: TerminalTab) => void;
   setEspView: (view: EspView) => void;
@@ -22,6 +23,7 @@ interface TerminalState {
   setVolatileMarket: (volatile: boolean) => void;
   setProvider: (provider: string) => void;
   setLearningMode: (learning: boolean) => void;
+  setAudioEnabled: (enabled: boolean) => void;
 }
 
 const TerminalStateContext = createContext<TerminalState | null>(null);
@@ -36,6 +38,7 @@ export function TerminalStateProvider({ children }: { children: React.ReactNode 
   const [volatileMarket, setVolatileMarket] = useState(false);
   const [provider, setProvider] = useState("ALL");
   const [learningMode, setLearningMode] = useState(false);
+  const [audioEnabled, setAudioEnabled] = useState(true);
 
   const value: TerminalState = {
     selectedPair,
@@ -47,6 +50,7 @@ export function TerminalStateProvider({ children }: { children: React.ReactNode 
     volatileMarket,
     provider,
     learningMode,
+    audioEnabled,
     setSelectedPair: useCallback((p: string) => setSelectedPair(p), []),
     setLeftTab: useCallback((t: TerminalTab) => setLeftTab(t), []),
     setEspView: useCallback((v: EspView) => setEspView(v), []),
@@ -56,6 +60,7 @@ export function TerminalStateProvider({ children }: { children: React.ReactNode 
     setVolatileMarket: useCallback((v: boolean) => setVolatileMarket(v), []),
     setProvider: useCallback((p: string) => setProvider(p), []),
     setLearningMode: useCallback((l: boolean) => setLearningMode(l), []),
+    setAudioEnabled: useCallback((e: boolean) => setAudioEnabled(e), []),
   };
 
   return React.createElement(TerminalStateContext.Provider, { value }, children);

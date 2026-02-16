@@ -60,7 +60,7 @@ export const orderFormSchema = z.object({
   direction: z.enum(["Buy", "Sell"], {
     required_error: "Direction is required",
   }),
-  type: z.enum(["LIMIT", "STOP"], {
+  type: z.enum(["LIMIT", "STOP", "TWAP", "VWAP"], {
     required_error: "Order type is required",
   }),
   amount: z

@@ -401,6 +401,23 @@ function formatMsgAmount(amount: number): string {
 
 export const MOCK_MESSAGES = generateMockMessages(20);
 
+// Position limits per currency pair (in base currency units)
+export const POSITION_LIMITS: Record<string, number> = {
+  "EUR/USD": 10_000_000,
+  "GBP/USD": 8_000_000,
+  "USD/JPY": 12_000_000,
+  "USD/CHF": 8_000_000,
+  "AUD/USD": 6_000_000,
+  "USD/CAD": 6_000_000,
+  "NZD/USD": 4_000_000,
+  "EUR/GBP": 6_000_000,
+  "USD/MXN": 5_000_000,
+  "USD/ZAR": 5_000_000,
+  "USD/TRY": 3_000_000,
+  "USD/NGN": 2_000_000,
+  "USD/BRL": 4_000_000,
+};
+
 export const MOCK_BALANCES: Balance[] = [
   { currency: "USD", available: 12_450_000, reserved: 3_200_000, total: 15_650_000 },
   { currency: "EUR", available: 8_320_000, reserved: 1_750_000, total: 10_070_000 },
